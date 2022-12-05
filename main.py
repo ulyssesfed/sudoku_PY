@@ -1,24 +1,22 @@
 import random
 
-# Create a 9x9 grid filled with 0s (empty cells)
-grid = [[0 for _ in range(9)] for _ in range(9)]
-
 # Helper function to check if a number can be placed at a given cell
-def can_place(grid, row, col, num):
+def can_place(grid, row, col, num, n):
     # Check if the number is already in the given row
     if num in grid[row]:
         return False
 
     # Check if the number is already in the given column
-    for i in range(9):
+    for i in range(n):
         if grid[i][col] == num:
             return False
 
-    # Check if the number is already in the 3x3 subgrid containing the given cell
-    subgrid_row = row // 3
-    subgrid_col = col // 3
-    for i in range(subgrid_row * 3, subgrid_row * 3 + 3):
-        for j in range(subgrid_col * 3, subgrid_col * 3 + 3):
+    # Check if the number is already in the subgrid containing the given cell
+    subgrid_size = int(n ** 0.5)
+    subgrid_row = row // subgrid_size
+    subgrid_col = col // subgrid_size
+    for i in range(subgrid_row * subgrid_size, subgrid_row * subgrid_size + subgrid_size):
+        for j in range(subgrid_col * subgrid_size, subgrid_col * subgrid_size + subgrid_size):
             if grid[i][j] == num:
                 return False
 
@@ -26,19 +24,22 @@ def can_place(grid, row, col, num):
     return True
 
 # Generate an unsolved Sudoku puzzle by making a random number of random moves
-def generate_unsolved_sudoku(difficulty):
+def generate_unsolved_sudoku(n, difficulty):
+    # Create an nxn grid filled with 0s (empty cells)
+    grid = [[0 for _ in range(n)] for _ in range(n)]
+
     # Make a random number of random moves
-    num_moves = random.randint(50, 70)
+    num_moves = random.randint(int(n * 0.5), int(n * 0.7))
     if difficulty == "easy":
-        num_moves -= 10
+        num_moves -= int(n * 0.1)
     elif difficulty == "hard":
-        num_moves += 10
+        num_moves += int(n * 0.1)
 
     for _ in range(num_moves):
-        row = random.randint(0, 8)
-        col = random.randint(0, 8)
-        num = random.randint(1, 9)
-        if can_place(grid, row, col, num):
+        row = random.randint(0, n - 1)
+        col = random.randint(0, n - 1)
+        num = random.randint(1, n)
+        if can_place(grid, row, col, num, n):
             grid[row][col] = num
 
     # Print the generated puzzle
@@ -47,11 +48,12 @@ def generate_unsolved_sudoku(difficulty):
 
 # Main program loop
 while True:
-    # Generate and print an unsolved Sudoku puzzle of the given difficulty level
+    # Generate and print an unsolved Sudoku puzzle of the given difficulty level and grid size
+    n = int(input("Enter the size of the grid (e.g. 4 for a 4x4 grid): "))
     difficulty = input("Enter the desired difficulty level (easy, medium, or hard) or 'exit' to quit: ")
     if difficulty == "exit":
         break
-    generate_unsolved_sudoku(difficulty)
+    generate_unsolved_sudoku(n, difficulty)
 
     # Ask the user if they want to try another puzzle or change the difficulty level
     choice = input("Enter 'again' to try another puzzle or 'change' to change the difficulty level: ")
